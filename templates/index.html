@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HIREBYTE - Setup Your Interview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8fafc;
+            overflow: hidden;
+        }
+
+        .split-viewport-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        .split-banner-left {
+            width: 65%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(67, 56, 202, 0.93), rgba(30, 27, 75, 0.95)),
+                url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 12% 0 80px;
+            box-sizing: border-box;
+            color: #ffffff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .split-banner-left::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 250px;
+            height: 100%;
+            background: linear-gradient(to right, transparent, #f8fafc);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .split-banner-left h1 {
+            font-size: 52px;
+            font-weight: 800;
+            margin: 0 0 18px 0;
+            letter-spacing: -1.5px;
+        }
+
+        .split-banner-left h1 span {
+            color: #a5b4fc;
+            background: linear-gradient(to right, #c7d2fe, #818cf8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .split-banner-left p {
+            font-size: 19px;
+            line-height: 1.6;
+            color: #cbd5e1;
+            max-width: 540px;
+            margin: 0;
+        }
+
+        .split-form-right {
+            font-family: "Poppins", sans-serif;
+            width: 35%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 3;
+            background-color: #f8fafc;
+        }
+
+        .top-version-tag {
+            position: absolute;
+            top: 30px;
+            right: 35px;
+            background: rgba(79, 70, 229, 0.08);
+            color: #4f46e5;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 100px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .custom-form-card {
+            width: 100%;
+            max-width: 420px;
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 40px 35px;
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.05), 0 15px 20px -10px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e2e8f0;
+            box-sizing: border-box;
+        }
+
+        .custom-form-card h2 {
+            font-size: 26px;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 8px 0;
+            letter-spacing: -0.5px;
+        }
+
+        .custom-form-card p.subtitle {
+            font-size: 14px;
+            color: #475569;
+            margin: 0 0 24px 0;
+            line-height: 1.5;
+        }
+
+        .custom-info-note {
+            background: rgba(79, 70, 229, 0.03);
+            border: 1px solid rgba(79, 70, 229, 0.08);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            font-size: 13.5px;
+            color: #334155;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .custom-input-group {
+            margin-bottom: 22px;
+            position: relative;
+        }
+
+        .custom-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #1e293b;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .custom-select,
+        .custom-file-input,
+        .custom-search-input {
+            width: 100%;
+            padding: 13px 16px;
+            border-radius: 12px;
+            border: 1.5px solid #cbd5e1;
+            background: #ffffff;
+            color: #0f172a;
+            font-size: 14.5px;
+            font-weight: 600;
+            outline: none;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .custom-search-input:focus,
+        .custom-file-input:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+        }
+
+        .dropdown-options-box {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.1);
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            padding: 6px 0;
+        }
+
+        .dropdown-item-row {
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .dropdown-item-row:hover {
+            background-color: rgba(79, 70, 229, 0.06);
+            color: #4f46e5;
+        }
+
+        .dropdown-item-row.hidden {
+            display: none;
+        }
+
+        .custom-submit-btn {
+            width: 100%;
+            background: #4f46e5;
+            color: #ffffff;
+            padding: 15px 24px;
+            font-size: 15.5px;
+            font-weight: 700;
+            text-align: center;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+            box-sizing: border-box;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .custom-submit-btn:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+        }
+
+        .custom-submit-btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 1024px) {
+            .split-viewport-container {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+
+            .split-banner-left {
+                width: 100%;
+                height: auto;
+                padding: 60px 40px;
+            }
+
+            .split-banner-left::after {
+                display: none;
+            }
+
+            .split-form-right {
+                width: 100%;
+                height: auto;
+                padding: 60px 20px;
+            }
+
+            .top-version-tag {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="split-viewport-container">
+
+        <div class="split-banner-left">
+            <h1>HIRE<span>BYTE</span></h1>
+            <p>Accelerate your placement analytics with next-generation real-time voice streaming interview modules.</p>
+        </div>
+
+        <div class="split-form-right">
+            <div class="top-version-tag">Next-gen hiring, powered by AI</div>
+
+            <div class="custom-form-card">
+                <h2>Welcome Candidate</h2>
+                <p class="subtitle">To start your screening session, please fill in the details below.</p>
+
+                <div class="custom-info-note">
+                    Our automated screening module will process your uploaded PDF resume data to align fundamental
+                    questions based on your domain.
+                </div>
+
+                <form action="/interview" method="POST" enctype="multipart/form-data" autocomplete="off">
+
+                    <div class="custom-input-group">
+                        <label for="job_role_search" class="custom-label">Target Job Role</label>
+                        <input type="text" id="job_role_search" class="custom-search-input"
+                            placeholder="Click to see or type role..." required>
+
+                        <input type="hidden" name="job_role" id="job_role" required>
+
+                        <div class="dropdown-options-box" id="dropdown_box">
+                            <div class="dropdown-item-row" data-value="AI Engineer">AI Engineer</div>
+                            <div class="dropdown-item-row" data-value="Data Scientist">Data Scientist</div>
+                            <div class="dropdown-item-row" data-value="Python Developer">Python Developer</div>
+                            <div class="dropdown-item-row" data-value="Machine Learning Engineer">Machine Learning
+                                Engineer</div>
+                            <div class="dropdown-item-row" data-value="Full Stack Developer">Full Stack Developer</div>
+                            <div class="dropdown-item-row" data-value="Frontend Developer">Frontend Developer</div>
+                            <div class="dropdown-item-row" data-value="Backend Developer">Backend Developer</div>
+                            <div class="dropdown-item-row" data-value="DevOps Engineer">DevOps Engineer</div>
+                            <div class="dropdown-item-row" data-value="Cloud Architect">Cloud Architect</div>
+                            <div class="dropdown-item-row" data-value="UI/UX Designer">UI/UX Designer</div>
+                        </div>
+                    </div>
+
+                    <div class="custom-input-group">
+                        <label for="cv" class="custom-label">Upload Your CV (PDF ONLY)</label>
+                        <input type="file" name="cv" id="cv" class="custom-file-input" accept=".pdf" required>
+                    </div>
+
+                    <button type="submit" class="custom-submit-btn">
+                        Start Screening Interview
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Search Engine Script Interface Control -->
+    <script>
+        const searchInput = document.getElementById('job_role_search');
+        const hiddenInput = document.getElementById('job_role');
+        const dropdownBox = document.getElementById('dropdown_box');
+        const dropdownItems = document.querySelectorAll('.dropdown-item-row');
+
+        // Show options list when clicked
+        searchInput.addEventListener('click', (e) => {
+            dropdownBox.style.display = 'block';
+            filterElements(e.target.value);
+        });
+
+        // Sequence text input filter handler
+        searchInput.addEventListener('input', (e) => {
+            dropdownBox.style.display = 'block';
+            filterElements(e.target.value);
+        });
+
+        // Event to filter elements sequence-wise
+        function filterElements(query) {
+            const cleanQuery = query.toLowerCase().trim();
+            dropdownItems.forEach(item => {
+                const textVal = item.textContent.toLowerCase();
+                if (textVal.includes(cleanQuery)) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
+
+        // Dropdown element selection script routing
+        dropdownItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const targetValue = item.getAttribute('data-value');
+                searchInput.value = targetValue;
+                hiddenInput.value = targetValue; // Set value for form submission pipeline
+                dropdownBox.style.display = 'none';
+            });
+        });
+
+        // Hide dropdown structure context if user clicks anywhere outside
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target) && !dropdownBox.contains(e.target)) {
+                dropdownBox.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>

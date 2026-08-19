@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Interview - Active Session</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <style>
+        html,
+        body {
+            height: 100vh;
+            max-height: 100vh;
+            overflow: hidden !important;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at top right, rgba(79, 70, 229, 0.05), transparent 800px),
+                radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.03), transparent 800px),
+                #e5edf5 !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .top-navbar {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 24px;
+            width: 100%;
+            max-width: 96%;
+            margin: 16px auto;
+            padding: 0 20px;
+            box-sizing: border-box;
+            align-items: stretch;
+            height: calc(100vh - 120px);
+        }
+
+        .main-left-panel,
+        .right-sidebar-feed {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-card {
+            background: #ffffff;
+            border: 1px solid rgba(229, 233, 240, 0.9);
+            box-shadow: 0 20px 40px -12px rgba(30, 34, 41, 0.04);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .panel-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue, #4f46e5), #10b981);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .interviewer-stream-container {
+            width: 100%;
+            flex-grow: 1;
+            min-height: 260px;
+            background: #0f172a;
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .interviewer-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.85;
+        }
+
+        .avatar-label-tag {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(8px);
+            color: #ffffff;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        .call-mic-overlay-action {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            background: rgb(109, 161, 185);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .call-mic-overlay-action.recording {
+            background: rgb(109, 161, 185);
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.4);
+            animation: ripplePulse 2s infinite;
+        }
+
+        .call-mic-overlay-action:hover {
+            transform: translateX(-50%) scale(1.08);
+        }
+
+        .call-mic-overlay-action svg {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        .client-live-speech-canvas {
+            background: rgba(79, 70, 229, 0.01);
+            border: 1px dashed rgba(79, 70, 229, 0.3);
+            border-radius: 14px;
+            padding: 14px 20px;
+            margin-bottom: 12px;
+            height: 75px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .integrated-summary-box {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.02) 0%, rgba(79, 70, 229, 0.05) 100%);
+            border: 1px solid rgba(79, 70, 229, 0.12);
+            border-radius: 14px;
+            padding: 14px 20px;
+            margin-bottom: 0px;
+            height: 75px;
+            overflow-y: auto;
+        }
+
+        .right-sidebar-feed {
+            background: #ffffff !important;
+            border: 1px solid rgba(226, 232, 240, 0.9) !important;
+            box-shadow: 0 20px 40px -12px rgba(30, 34, 41, 0.06) !important;
+            border-radius: 20px;
+            padding: 24px 20px;
+            box-sizing: border-box;
+        }
+
+        .nodes-scroller-track {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 8px 4px;
+        }
+
+        .question-node-item {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scale(1);
+        }
+
+        .question-node-item.active {
+            border-color: var(--primary-blue, #4f46e5);
+            border-width: 1.5px;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.12);
+            background: rgba(79, 70, 229, 0.03) !important;
+            border-radius: 12px;
+            transform: scale(1.04);
+            margin-left: 4px;
+            margin-right: 4px;
+            z-index: 5;
+        }
+
+        .question-node-item.active .node-main-text {
+            font-size: 13.5px !important;
+            font-weight: 600 !important;
+            color: #0f172a !important;
+        }
+
+        .question-node-item.completed {
+            background: #f8fafc;
+            border-color: #e2e8f0;
+        }
+
+        .tick-badge {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            background: #d1fae5;
+            color: #10b981;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        .time-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 16px;
+            background: rgba(79, 70, 229, 0.08);
+            color: var(--primary-blue, #4f46e5);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+
+        .status-tag {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .live-matrix-metrics-node {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 12px;
+        }
+
+        .matrix-row-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            padding: 4px 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .matrix-row-item:last-child {
+            border: none;
+        }
+
+        @keyframes livePulse {
+            0% {
+                transform: scale(0.92);
+                opacity: 0.6;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(0.92);
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes ripplePulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(30, 41, 59, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 15px rgba(30, 41, 59, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(30, 41, 59, 0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="top-navbar">
+        <div class="brand-logo" style="font-weight: 800; font-size: 20px; color: #0f172a;">HIRE<span
+                style="color: #4f46e5;">BYTE</span></div>
+        <div class="action-pill-row">
+            <div class="live-indicator"
+                style="display: flex; align-items: center; gap: 8px; font-weight: 600; padding: 6px 14px; border-radius: 100px; background: rgba(239, 68, 68, 0.1); color: #ef4444; font-size: 13px;">
+                <span
+                    style="width: 8px; height: 8px; background: #ef4444; border-radius: 50%; display: inline-block; animation: livePulse 1.8s infinite;"></span>
+                Live Recording
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+
+        <div class="main-left-panel">
+            <div class="panel-card">
+                <div class="session-header-area" style="margin-bottom: 14px;">
+                    <div class="title-meta">
+                        <h2 style="margin: 0 0 4px 0; font-size: 20px; font-weight: 700; color: #0f172a;">Hiring – {{
+                            job_role }}</h2>
+                        <p style="margin: 0; font-size: 12px; color: #64748b; font-weight: 500;">Processing active
+                            candidate stream feed via Web Audio APIs.</p>
+                    </div>
+                </div>
+
+                <div class="interviewer-stream-container">
+                    <div class="avatar-label-tag">
+                        <span style="width: 6px; height: 6px; background: #10b981; border-radius: 50%;"></span>
+                        AI Interviewer Panel
+                    </div>
+
+                    <img src="https://www.talview.com/hs-fs/hubfs/AI_V.png?width=842&name=AI_V.png"
+                        class="interviewer-img" alt="Interviewer">
+
+                    <button type="button" id="recordBtn" class="call-mic-overlay-action" title="Toggle Voice Stream">
+                        <svg id="micIcon" viewBox="0 0 24 24">
+                            <path
+                                d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.2 6 6.67V21h2v-3.33c3.28-.47 6-3.25 6-6.67h-1.7z" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="client-live-speech-canvas">
+                    <span
+                        style="font-size: 9px; text-transform: uppercase; font-weight: 700; color: #64748b; margin-bottom: 4px; letter-spacing: 0.8px;">Your
+                        Real-time Transcript Feed</span>
+                    <p id="speech_output"
+                        style="margin: 0; font-size: 13px; font-style: italic; line-height: 1.5; color: #475569;">
+                        Your spoken answers will appear here in real-time.
+                    </p>
+                </div>
+
+                <div class="integrated-summary-box">
+                    <h4
+                        style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: #4f46e5; margin: 0 0 4px 0; font-weight: 700;">
+                        Question Summary</h4>
+                    <p style="margin: 0; font-size: 13px; font-weight: 500; line-height: 1.5; color: #334155;">
+                        {{ summary }}
+                    </p>
+                </div>
+
+                <form action="/submit_answer" method="POST" id="interviewForm" style="margin: 0;">
+                    <input type="hidden" name="user_answer" id="hidden_user_answer" required>
+                    <input type="hidden" name="time_taken" id="time_taken" value="0">
+                    <button type="submit" id="submitBtn"
+                        style="display: none; width: 100%; margin-top: 8px; padding: 10px; background: #4f46e5; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Submit
+                        Answer</button>
+                </form>
+            </div>
+        </div>
+
+        <aside class="right-sidebar-feed">
+            <div class="feed-header-tabs"
+                style="margin-bottom: 16px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
+                <div class="tab-item active"
+                    style="width: 100%; font-weight: 700; color: #0f172a; font-size: 13px; letter-spacing: 0.3px;">
+                    Interview Progress Grid</div>
+            </div>
+
+            <div class="nodes-scroller-track">
+                {% set start_win = current_idx %}
+                {% if current_idx >= 5 %}
+                {% set start_win = 5 %}
+                {% endif %}
+                {% set end_win = start_win + 3 %}
+
+                {% for i in range(start_win, end_win + 1) %}
+                {% if i < questions_list|length %} <div
+                    class="question-node-item {% if current_idx == i %}active{% elif current_idx > i %}completed{% endif %}"
+                    {% if current_idx < i %}style="opacity: 0.55;" {% endif %}>
+                    <div class="node-meta-index"
+                        style="font-weight: 700; font-size: 11px; color: #4f46e5; margin-bottom: 4px;">
+                        QUESTION {{ "%02d"|format(i + 1) }}
+                    </div>
+                    <div class="node-main-text"
+                        style="padding-bottom: 8px; font-size: 12px; font-weight: 500; color: #334155; line-height: 1.4;">
+                        {{ questions_list[i]["q"] }}
+                    </div>
+
+                    {% if current_idx == i %}
+                    <span class="status-tag" style="color: #4f46e5;">Active</span>
+                    {% elif current_idx > i %}
+                    <span class="tick-badge">✓ Done</span>
+                    <span class="time-badge">⏱ {{ durations[i] }}s</span>
+                    {% else %}
+                    <span class="status-tag" style="color: #94a3b8;">Pending</span>
+                    {% endif %}
+            </div>
+            {% endif %}
+            {% endfor %}
+    </div>
+
+    <div class="live-matrix-metrics-node">
+        <span
+            style="font-size: 9px; font-weight: 700; text-transform: uppercase; color: #64748b; display: block; margin-bottom: 8px; letter-spacing: 0.5px;">Live
+            Evaluation Stream</span>
+        <div class="matrix-row-item"><span>Audio Feed Check</span><strong style="color: #10b981;">16-bit PCM OK</strong>
+        </div>
+        <div class="matrix-row-item"><span>Acoustic Clarity</span><strong style="color: #4f46e5;">High Profile</strong>
+        </div>
+        <div class="matrix-row-item"><span>Language Engine</span><strong style="color: #334155;">En-IN (Hybrid)</strong>
+        </div>
+    </div>
+    </aside>
+
+    </div>
+
+    <footer
+        style="width: 100%; height: 40px; border-top: 1px solid #e2e8f0; background: #ffffff; padding: 0 40px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #94a3b8; font-weight: 500;">
+        <span>Session Channel: WebRTC Secure Audio Stream Link</span>
+        <span>© 2026 HIREBYTE System Frameworks.</span>
+    </footer>
+
+    <script>
+        const startTimeStamp = Date.now();
+        const recordBtn = document.getElementById('recordBtn');
+        const micIcon = document.getElementById('micIcon');
+        const speechOutput = document.getElementById('speech_output');
+        const hiddenUserAnswer = document.getElementById('hidden_user_answer');
+        const submitBtn = document.getElementById('submitBtn');
+        const timeTakenInput = document.getElementById('time_taken');
+        const interviewForm = document.getElementById('interviewForm');
+
+        interviewForm.addEventListener('submit', () => {
+            const endTimeStamp = Date.now();
+            const totalSeconds = Math.round((endTimeStamp - startTimeStamp) / 1000);
+            timeTakenInput.value = totalSeconds;
+        });
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            alert("SpeechRecognition context structure is unavailable on this browser channel.");
+        } else {
+            const recognition = new SpeechRecognition();
+            recognition.continuous = true;
+
+            recognition.interimResults = false;
+
+            recognition.lang = 'en-IN';
+
+            let isRecording = false;
+            let globalAnswerTranscript = "";
+
+            recordBtn.addEventListener('click', () => {
+                if (!isRecording) {
+                    globalAnswerTranscript = "";
+                    hiddenUserAnswer.value = "";
+                    speechOutput.innerText = "Listening...";
+
+                    recognition.start();
+                } else {
+                    recognition.stop();
+                }
+            });
+
+            recognition.onstart = () => {
+                isRecording = true;
+                recordBtn.classList.add('recording');
+                micIcon.innerHTML = '<rect x="6" y="6" width="12" height="12" rx="2" />';
+                submitBtn.style.display = 'none';
+            };
+
+            recognition.onresult = (event) => {
+                let incrementalFinal = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        incrementalFinal += event.results[i][0].transcript + " ";
+                    }
+                }
+                globalAnswerTranscript += incrementalFinal;
+                if (globalAnswerTranscript.trim() !== "") {
+                    speechOutput.innerText = globalAnswerTranscript;
+                    hiddenUserAnswer.value = globalAnswerTranscript;
+                }
+            };
+
+            recognition.onend = () => {
+                isRecording = false;
+                recordBtn.classList.remove('recording');
+                micIcon.innerHTML = '<path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>';
+                if (hiddenUserAnswer.value.trim() !== "") {
+                    submitBtn.style.display = 'block';
+                } else {
+                    micIcon.innerHTML = '<path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.42 2.72 6.2 6 6.67V21h2v-3.33c3.28-.47 6-3.25 6-6.67h-1.7z"/>';
+                    speechOutput.innerText = "Your spoken answers will appear here in real-time.";
+                }
+            };
+        }
+    </script>
+</body>
+
+</html>
